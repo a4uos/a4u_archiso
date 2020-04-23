@@ -3,7 +3,7 @@
 set -e -u
 
 isouser="liveuser"
-OSNAME="ctlos"
+OSNAME="a4u"
 
 
 localeGen() {
