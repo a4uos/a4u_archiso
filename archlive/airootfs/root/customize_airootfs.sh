@@ -25,12 +25,19 @@ sed -i 's/#\(HandleLidSwitch=\)suspend/\1ignore/' /etc/systemd/logind.conf
 
 reflector --verbose -l 5 -p http --sort rate --save /etc/pacman.d/mirrorlist
 
+initkeys() {
+     pacman-key --init
+     #pacman-key --keyserver keys.gnupg.net --recv-keys 98F76D97B786E6A3
+     #pacman-key --lsign-key 98F76D97B786E6A3
+     pacman-key --populate archlinux
+     pacman -Syy --noconfirm
+ }
+
+
 wget https://raw.githubusercontent.com/a4uos/a4u_config/master/img/a4u.png
 mv -f a4u.png /usr/share/pixmaps/a4u.png
 
 wget https://raw.githubusercontent.com/a4uos/a4u_config/master/img/bg.jpg
-mkdir /usr/share/backgrounds
-mkdir /usr/share/backgrounds/xfce
 mv -f bg.jpg /usr/share/backgrounds/xfce/bg.jpg
 
 systemctl enable pacman-init.service choose-mirror.service
