@@ -27,8 +27,6 @@ reflector --verbose -l 5 -p http --sort rate --save /etc/pacman.d/mirrorlist
 
 initkeys() {
      pacman-key --init
-     #pacman-key --keyserver keys.gnupg.net --recv-keys 98F76D97B786E6A3
-     #pacman-key --lsign-key 98F76D97B786E6A3
      pacman-key --populate archlinux
      pacman -Syy --noconfirm
  }
