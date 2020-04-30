@@ -9,11 +9,10 @@ ln -sf /usr/share/zoneinfo/UTC /etc/localtime
 
 usermod -s /usr/bin/bash root
 cp -aT /etc/skel/ /root/
-# chown -R liveuser:users /home/liveuser
-#chmod 700 /root
 
 useradd -m -p "" -g users -G "adm,audio,floppy,log,network,rfkill,scanner,storage,optical,power,wheel" -s /bin/bash liveuser
-# chown -R liveuser:users /home/liveuser
+passwd -d liveuser
+echo "liveuser ALL=(ALL) ALL" >> /etc/sudoers
 
 sed -i 's/#\(PermitRootLogin \).\+/\1yes/' /etc/ssh/sshd_config
 sed -i "s/#Server/Server/g" /etc/pacman.d/mirrorlist
@@ -31,12 +30,21 @@ initkeys() {
      pacman -Syy --noconfirm
  }
 
+# Удаление тем по умолчанию
+sudo rm -rf /usr/share/themes/*
 
-wget https://raw.githubusercontent.com/a4uos/a4u_config/master/img/a4u.png
-mv -f a4u.png /usr/share/pixmaps/a4u.png
+# Установка конфига Xfce
+# wget https://github.com/ordanax/arch/raw/master/attach/config.tar.gz
+# rm -rf ~/.config/xfce4/panel/
+# rm -rf ~/.config/xfce4/*
+# tar -xzf config.tar.gz -C ~/
 
-wget https://raw.githubusercontent.com/a4uos/a4u_config/master/img/bg.jpg
-mv -f bg.jpg /usr/share/backgrounds/xfce/bg.jpg
+# wget https://raw.githubusercontent.com/a4uos/a4u_config/master/img/a4u.png
+# mv -f a4u.png /usr/share/pixmaps/a4u.png
+
+# wget https://raw.githubusercontent.com/a4uos/a4u_config/master/img/bg.jpg
+# mv -f bg.jpg /usr/share/backgrounds/xfce/bg.jpg
 
 systemctl enable pacman-init.service choose-mirror.service
 systemctl set-default graphical.target
+systemctl start NetworkManager.service
