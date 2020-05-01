@@ -1,11 +1,14 @@
 #!/bin/bash
 
 set -e -u
-
-sed -i 's/#\(ru_RU\.UTF-8\)/\1/' /etc/locale.gen
+sed -i 's/#\(en_US\.UTF-8\)/\1/' /etc/locale.gen
+sed -i "s/#\(ru_RU\.UTF-8\)/\1/" /etc/locale.gen
 locale-gen
-# ! id arch && useradd -m -p "" -g users -G "adm,audio,floppy,log,network,rfkill,scanner,storage,optical,power,wheel" -s /usr/bin/bash arch
+# Vconsole
+echo "KEYMAP=ru" > /etc/vconsole.conf
+echo "FONT=cyr-sun16" >> /etc/vconsole.conf
 ln -sf /usr/share/zoneinfo/UTC /etc/localtime
+
 
 usermod -s /usr/bin/bash root
 cp -aT /etc/skel/ /root/
@@ -28,23 +31,19 @@ initkeys() {
      pacman-key --init
      pacman-key --populate archlinux
      pacman -Syy --noconfirm
+     pacman -Syu
  }
 
 # Удаление тем по умолчанию
-sudo rm -rf /usr/share/themes/*
+# sudo rm -rf /usr/share/themes/*
 
-# Установка конфига Xfce
-# wget https://github.com/ordanax/arch/raw/master/attach/config.tar.gz
-# rm -rf ~/.config/xfce4/panel/
-# rm -rf ~/.config/xfce4/*
-# tar -xzf config.tar.gz -C ~/
+fixWifi() {
+    su -c 'echo "" >> /etc/NetworkManager/NetworkManager.conf'
+    su -c 'echo "[device]" >> /etc/NetworkManager/NetworkManager.conf'
+    su -c 'echo "wifi.scan-rand-mac-address=no" >> /etc/NetworkManager/NetworkManager.conf'
+}
 
-# wget https://raw.githubusercontent.com/a4uos/a4u_config/master/img/a4u.png
-# mv -f a4u.png /usr/share/pixmaps/a4u.png
-
-# wget https://raw.githubusercontent.com/a4uos/a4u_config/master/img/bg.jpg
-# mv -f bg.jpg /usr/share/backgrounds/xfce/bg.jpg
-
-systemctl enable pacman-init.service choose-mirror.service
+systemctl enable NetworkManager.service
 systemctl set-default graphical.target
-systemctl start NetworkManager.service
+
+fixWifi
