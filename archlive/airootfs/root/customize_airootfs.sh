@@ -84,14 +84,14 @@ reflector --verbose -l 5 -p http --sort rate --save /etc/pacman.d/mirrorlist
 initkeys() {
      pacman-key --init
      pacman-key --populate archlinux
-     pacman -Syy --noconfirm
+     pacman -Syyu --noconfirm
  }
 
 # Удаление тем по умолчанию
 # sudo rm -rf /usr/share/themes/*
 sudo rm -rf /usr/share/backgrounds/
 
-fixWifi() {
+                                                                        fixWifi() {
     su -c 'echo "" >> /etc/NetworkManager/NetworkManager.conf'
     su -c 'echo "[device]" >> /etc/NetworkManager/NetworkManager.conf'
     su -c 'echo "wifi.scan-rand-mac-address=no" >> /etc/NetworkManager/NetworkManager.conf'
@@ -108,5 +108,3 @@ configRootUser
 setDefaults
 fontFix
 fixWifi
-
-sudo pacman -Syu

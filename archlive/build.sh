@@ -1,4 +1,9 @@
 #!/bin/bash
+# rm -rf /var/cache/pacman/pkg/*
+
+pacman-key --init
+pacman-key --populate archlinux
+
 set -e -u
 
 iso_name=a4u
