@@ -23,7 +23,7 @@ editOrCreateConfigFiles() {
     echo "FONT=cyr-sun16" >> /etc/vconsole.conf
 
     # Hostname
-    echo "liveuser" > /etc/hostname
+    echo "a4u" > /etc/hostname
 
     sed -i "s/#Server/Server/g" /etc/pacman.d/mirrorlist
     sed -i 's/#\(Storage=\)auto/\1volatile/' /etc/systemd/journald.conf
