@@ -1,5 +1,5 @@
 #!/bin/bash
-# rm -rf /var/cache/pacman/pkg/*
+rm -rf /var/cache/pacman/pkg/*
 
 pacman-key --init
 pacman-key --populate archlinux
@@ -18,6 +18,7 @@ gpg_key=
 
 verbose=""
 script_path=$(readlink -f ${0%/*})
+MKARCH_ISO=$script_path/mkarchiso
 
 umask 0022
 
@@ -64,13 +65,13 @@ make_pacman_conf() {
 
 # Base installation, plus needed packages (airootfs)
 make_basefs() {
-    mkarchiso ${verbose} -w "${work_dir}/x86_64" -C "${work_dir}/pacman.conf" -D "${install_dir}" init
-    mkarchiso ${verbose} -w "${work_dir}/x86_64" -C "${work_dir}/pacman.conf" -D "${install_dir}" -p "haveged intel-ucode amd-ucode memtest86+ mkinitcpio-nfs-utils nbd zsh efitools" install
+    $MKARCH_ISO ${verbose} -w "${work_dir}/x86_64" -C "${work_dir}/pacman.conf" -D "${install_dir}" init
+    $MKARCH_ISO ${verbose} -w "${work_dir}/x86_64" -C "${work_dir}/pacman.conf" -D "${install_dir}" -p "haveged intel-ucode amd-ucode memtest86+ mkinitcpio-nfs-utils nbd zsh efitools" install
 }
 
 # Additional packages (airootfs)
 make_packages() {
-    mkarchiso ${verbose} -w "${work_dir}/x86_64" -C "${work_dir}/pacman.conf" -D "${install_dir}" -p "$(grep -h -v ^# ${script_path}/packages.x86_64)" install
+    $MKARCH_ISO ${verbose} -w "${work_dir}/x86_64" -C "${work_dir}/pacman.conf" -D "${install_dir}" -p "$(grep -h -v ^# ${script_path}/packages.x86_64)" install
 }
 
 # Copy mkinitcpio archiso hooks and build initramfs (airootfs)
@@ -91,7 +92,7 @@ make_setup_mkinitcpio() {
       gpg --export ${gpg_key} >${work_dir}/gpgkey
       exec 17<>${work_dir}/gpgkey
     fi
-    ARCHISO_GNUPG_FD=${gpg_key:+17} mkarchiso ${verbose} -w "${work_dir}/x86_64" -C "${work_dir}/pacman.conf" -D "${install_dir}" -r 'mkinitcpio -c /etc/mkinitcpio-archiso.conf -k /boot/vmlinuz-linux -g /boot/archiso.img' run
+    ARCHISO_GNUPG_FD=${gpg_key:+17} $MKARCH_ISO ${verbose} -w "${work_dir}/x86_64" -C "${work_dir}/pacman.conf" -D "${install_dir}" -r 'mkinitcpio -c /etc/mkinitcpio-archiso.conf -k /boot/vmlinuz-linux -g /boot/archiso.img' run
     if [[ ${gpg_key} ]]; then
       exec 17<&-
     fi
@@ -107,7 +108,7 @@ make_customize_airootfs() {
 
     lynx -dump -nolist 'https://wiki.archlinux.org/index.php/Installation_Guide?action=render' >> ${work_dir}/x86_64/airootfs/root/install.txt
 
-    mkarchiso ${verbose} -w "${work_dir}/x86_64" -C "${work_dir}/pacman.conf" -D "${install_dir}" -r '/root/customize_airootfs.sh' run
+    $MKARCH_ISO ${verbose} -w "${work_dir}/x86_64" -C "${work_dir}/pacman.conf" -D "${install_dir}" -r '/root/customize_airootfs.sh' run
     rm ${work_dir}/x86_64/airootfs/root/customize_airootfs.sh
 }
 
@@ -217,15 +218,15 @@ make_efiboot() {
 # Build airootfs filesystem image
 make_prepare() {
     cp -a -l -f ${work_dir}/x86_64/airootfs ${work_dir}
-    mkarchiso ${verbose} -w "${work_dir}" -D "${install_dir}" pkglist
-    mkarchiso ${verbose} -w "${work_dir}" -D "${install_dir}" ${gpg_key:+-g ${gpg_key}} prepare
+    $MKARCH_ISO ${verbose} -w "${work_dir}" -D "${install_dir}" pkglist
+    $MKARCH_ISO ${verbose} -w "${work_dir}" -D "${install_dir}" ${gpg_key:+-g ${gpg_key}} prepare
     rm -rf ${work_dir}/airootfs
     # rm -rf ${work_dir}/x86_64/airootfs (if low space, this helps)
 }
 
 # Build ISO
 make_iso() {
-    mkarchiso ${verbose} -w "${work_dir}" -D "${install_dir}" -L "${iso_label}" -P "${iso_publisher}" -A "${iso_application}" -o "${out_dir}" iso "${iso_name}-${iso_version}-x86_64.iso"
+    $MKARCH_ISO ${verbose} -w "${work_dir}" -D "${install_dir}" -L "${iso_label}" -P "${iso_publisher}" -A "${iso_application}" -o "${out_dir}" iso "${iso_name}-${iso_version}-x86_64.iso"
 }
 
 if [[ ${EUID} -ne 0 ]]; then
