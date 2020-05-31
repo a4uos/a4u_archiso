@@ -201,8 +201,6 @@ _cleanup () {
     # Delete package pacman related files.
     find "${work_dir}" \( -name "*.pacnew" -o -name "*.pacsave" -o -name "*.pacorig" \) -delete
     _msg_info "Done!"
-    echo "Clean Up Done" >> /home/ordanax/done.txt
-
 }
 
 # Makes a ext4 filesystem inside a SquashFS from a source directory.
@@ -252,7 +250,6 @@ _mkairootfs_sfs () {
         mksquashfs "${work_dir}/airootfs" "${work_dir}/iso/${install_dir}/${arch}/airootfs.sfs" -noappend -comp "${sfs_comp}" -no-progress
     fi
     _msg_info "Done!"
-    echo "Chroot Done" >> /home/ordanax/done.txt
 }
 
 _mkchecksum () {
